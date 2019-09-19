@@ -1,0 +1,7 @@
+body {
+    text-align: center;
+}
+
+#boy, #cat-girl, #pink-girl, #princess-girl, #horn-girl {
+    cursor: pointer; 
+}
