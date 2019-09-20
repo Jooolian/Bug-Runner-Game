@@ -5,3 +5,33 @@ body {
 #boy, #cat-girl, #pink-girl, #princess-girl, #horn-girl {
     cursor: pointer; 
 }
+
+#heart1, #heart2, #heart3 {
+    color: #e80909;
+}
+
+#info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#hearts {
+    margin-right: 50px; 
+}
+
+#points {
+    font-family: 'Pacifico', cursive;
+    font-size: 32px;
+    margin-left: 50px;
+}
+
+.modal-title {
+    font-family: 'Pacifico', cursive;
+    font-size: 32px;
+}
+
+canvas {
+    margin-top: -20px;
+}

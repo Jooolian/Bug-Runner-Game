@@ -1,28 +1,44 @@
-$(document).ready(function(){
+$(document).ready(function() {
   // Show the Modal on load
   $("#myModal").modal("show");
 });
 
-$("#boy").click(function() {
-  player.sprite = 'images/char-boy.png';
+$("#characters").click(function(event) {
+  switch (event.target.id) {
+    case "boy":
+      player.sprite = 'images/char-boy.png';
+      break;
+    case "cat-girl":
+      player.sprite = 'images/char-cat-girl.png';
+      break;
+    case "pink-girl":
+      player.sprite = 'images/char-pink-girl.png';
+      break;
+    case "princess-girl":
+      player.sprite = 'images/char-princess-girl.png';
+      break;  
+    case "horn-girl":
+      player.sprite = 'images/char-horn-girl.png';
+      break;  
+  }
+
   $("#myModal").modal("hide");
-})
-$("#cat-girl").click(function() {
-  player.sprite = 'images/char-cat-girl.png';
-  $("#myModal").modal("hide");
-})
-$("#pink-girl").click(function() {
-  player.sprite = 'images/char-pink-girl.png';
-  $("#myModal").modal("hide");
-})
-$("#princess-girl").click(function() {
-  player.sprite = 'images/char-princess-girl.png';
-  $("#myModal").modal("hide");
-})
-$("#horn-girl").click(function() {
-  player.sprite = 'images/char-horn-girl.png';
-  $("#myModal").modal("hide");
-})
+
+  // This listens for key presses and sends the keys to
+  // Player.handleInput() method. This should only be enabled
+  // after player has chosen a character
+document.addEventListener('keyup', function(e) {
+  var allowedKeys = {
+      37: 'left',
+      38: 'up',
+      39: 'right',
+      40: 'down'
+  };
+
+  player.handleInput(allowedKeys[e.keyCode]);
+});
+
+});
 
 // to keep score of points
 let score = 0;
@@ -93,6 +109,7 @@ class ThePlayer {
          if (this.x < enemy.x + enemy.collisionWidth && this.x + this.collisionWidth > enemy.x && this.y < enemy.y + enemy.collisionHeight && this.y + this.collisionHeight > enemy.y) {
            // if yes change score and reset to start
            this.restart();
+           reduceHearts();
          }
        };
 
@@ -175,15 +192,23 @@ let enemyEight = new Enemy(3, 75);
 allEnemies.push(enemyEight);
 
 
-// This listens for key presses and sends the keys to
-// Player.handleInput() method.
-document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
 
-    player.handleInput(allowedKeys[e.keyCode]);
-});
+// reduce number of hearts when collision between player and enemy
+function reduceHearts() {
+  const activeHeart = "rgb(232, 9, 9)";
+  const lostHeart = "#e8e8e8";
+  console.log("first");
+  console.log($("#heart1").css("color"))
+
+  if ($("#heart1").css("color") == activeHeart) {
+    $("#heart1").css("color", lostHeart);
+    console.log("first");
+  }
+  else if ( $("#heart2").css("color") == activeHeart) {
+    $("#heart2").css("color", lostHeart);
+  }
+  else if ($("#heart3").css("color") == activeHeart) {
+    $("#heart3").css("color", lostHeart);
+    window.confirm("Game Over!");
+  }
+}
