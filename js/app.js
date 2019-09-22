@@ -63,7 +63,7 @@ var Enemy = function(startY, speed) {
 Enemy.prototype.update = function(dt) {
   
     // the enemies should disappear when they leave the screen to the right
-    const borderRight = 505;
+    const borderRight = 707;
     // if enemies leave the screen to the right, reset them to the left
     if (this.x > borderRight) {
         this.x = this.startX;
@@ -91,7 +91,7 @@ class ThePlayer {
     this.horizontalStep = 101;
     this.verticalStep = 83;
     // the player is horizontally centered at the bottom
-    this.startX = 2 * this.horizontalStep;
+    this.startX = 3 * this.horizontalStep;
     this.startY = (4 * this.verticalStep) + 60; // add 60 here to vertically align with enemies
     // set x and y to starting values
     this.x = this.startX;
@@ -156,7 +156,7 @@ class ThePlayer {
     if (key == "left" && this.x >= this.horizontalStep) {
       this.x -= this.horizontalStep;
     } console.log(this.x, this.y)
-    if (key == "right" && this.x <= (3 * this.horizontalStep)) {
+    if (key == "right" && this.x <= (5 * this.horizontalStep)) {
       this.x += this.horizontalStep;
     } console.log(this.x, this.y)
   }
