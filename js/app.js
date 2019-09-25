@@ -262,6 +262,9 @@ let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
 // create/ change coordinates properties in rocks object
 rocks.x = randomCoordinateX;
 rocks.y = randomCoordinateY;
+
+// repeatedly call function to move rock around
+setInterval(moveRock, 10000);
 }
 
 moveRock();
