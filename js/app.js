@@ -14,9 +14,6 @@ $("#characters").click(function(event) {
     case "pink-girl":
       player.sprite = 'images/char-pink-girl.png';
       break;
-    case "princess-girl":
-      player.sprite = 'images/char-princess-girl.png';
-      break;  
     case "horn-girl":
       player.sprite = 'images/char-horn-girl.png';
       break;  
@@ -154,18 +151,39 @@ class ThePlayer {
   // handle the input from the eventlistener and change this.x
   // and this.y accordingly so the player moves
   handleInput(key) {
-    if (key == "up" && this.y >= 60) {
+    // to better understand the restrictions around the rocks: height of the pngs is 171, visible height only 83!
+    // step up
+    if(key == "up" && this.y >= 60 && this.x != rocks.x) {
       this.y -= this.verticalStep;
-    } console.log(this.x, this.y)
-    if (key == "down" && this.y < (4 * this.verticalStep)) {
+    } 
+    // block step up if rock is in the way 
+    else if(key == "up" && this.y >= 60 && this.x == rocks.x && (this.y >= rocks.y + (2 * this.verticalStep + 10) || this.y < rocks.y)) {
+      this.y -= this.verticalStep;
+    }
+    // step down
+    else if(key == "down" && this.y < (4 * this.verticalStep) && this.x != rocks.x) {
       this.y += this.verticalStep;
-    } console.log(this.x, this.y)
-    if (key == "left" && this.x >= this.horizontalStep) {
+    } 
+    // block step down if rock is in the way
+    else if(key == "down" && this.y < (4 * this.verticalStep) && this.x == rocks.x && (this.y <= rocks.y - this.verticalStep || this.y > rocks.y)) {
+      this.y += this.verticalStep;
+    } 
+    // step to the left
+    else if(key == "left" && this.x >= this.horizontalStep && this.y != rocks.y + 10) {
       this.x -= this.horizontalStep;
-    } console.log(this.x, this.y)
-    if (key == "right" && this.x <= (5 * this.horizontalStep)) {
+    } 
+    // block step to the left if rock is in the way
+    else if(key == "left" && this.x >= this.horizontalStep && this.y == rocks.y + 10 && (this.x >= rocks.x + 2 * this.horizontalStep || this.x <= rocks.x - this.horizontalStep)) {
+      this.x -= this.horizontalStep;
+    } 
+    // step to the right
+    else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y != rocks.y + 10) {
       this.x += this.horizontalStep;
-    } console.log(this.x, this.y)
+    } 
+      // block step to the left if rock is in the way
+    else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y == rocks.y + 10 && (this.x <= rocks.x - 2 * this.horizontalStep || this.x >= rocks.x + this.horizontalStep)) {
+      this.x += this.horizontalStep;
+    } 
   }
 };
 
@@ -220,17 +238,30 @@ function reduceHearts() {
   }
 }
 
+
 // water traps
 // canvas = document.createElement('canvas');
 // ctx = canvas.getContext('2d');
 
-// const waterTraps = {
-//   sprite: "images/water-block.png",
-//   x: 101,
-//   y: 83,
-//   render: function() {
-//   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-//   }
-// }
+const rocks = {
+  sprite: "images/Rock.png",
+  render: function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  }
+}
 
-// waterTraps.render();
+// function to move rocks around inside the playing field
+function moveRock() {
+//array for locations on playing field x: 0-101-202-303-404-505-606 and y: 57-140-223-306
+const playingField = [[0, 101, 202, 303, 404, 505, 606], [50, 133, 216, 299]];
+
+// create random numbers in the range of the indexes of the two arrays within playingField
+let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
+let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
+
+// create/ change coordinates properties in rocks object
+rocks.x = randomCoordinateX;
+rocks.y = randomCoordinateY;
+}
+
+moveRock();
