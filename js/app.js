@@ -239,10 +239,7 @@ function reduceHearts() {
 }
 
 
-// water traps
-// canvas = document.createElement('canvas');
-// ctx = canvas.getContext('2d');
-
+// rocks
 const rocks = {
   sprite: "images/Rock.png",
   render: function() {
@@ -250,8 +247,16 @@ const rocks = {
   }
 }
 
+// water
+const water = {
+  sprite: "images/water-block.png",
+  render: function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  }
+}
+
 // function to move rocks around inside the playing field
-function moveRock() {
+function move() {
 //array for locations on playing field x: 0-101-202-303-404-505-606 and y: 57-140-223-306
 const playingField = [[0, 101, 202, 303, 404, 505, 606], [50, 133, 216, 299]];
 
@@ -259,12 +264,33 @@ const playingField = [[0, 101, 202, 303, 404, 505, 606], [50, 133, 216, 299]];
 let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
 let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
 
-// create/ change coordinates properties in rocks object
-rocks.x = randomCoordinateX;
-rocks.y = randomCoordinateY;
+let coordinates = [randomCoordinateX, randomCoordinateY];
 
-// repeatedly call function to move rock around
-setInterval(moveRock, 10000);
+return coordinates; 
+}
+
+function moveRock() {
+  let coordinatesRocks = move();
+
+  // create/ change coordinates properties in rocks object
+  rocks.x = coordinatesRocks[0];
+  rocks.y = coordinatesRocks[1];
+
+  // repeatedly call function to move rock around
+  setInterval(moveRock, 10000);
 }
 
 moveRock();
+
+function moveWater() {
+  let coordinatesWater = move();
+
+  // create/ change coordinates properties in rocks object
+  water.x = coordinatesWater[0];
+  water.y = coordinatesWater[1];
+
+  // repeatedly call function to move rock around
+  setInterval(moveWater, 10000);
+}
+
+moveWater();
