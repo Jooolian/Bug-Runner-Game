@@ -19,7 +19,6 @@ $("#characters").click(function(event) {
       break;  
   }
   
-
   $("#myModal").modal("hide");
 
   // This listens for key presses and sends the keys to
@@ -216,8 +215,6 @@ let enemySeven = new Enemy(3, 175);
 let enemyEight = new Enemy(3, 75);
 allEnemies.push(enemyEight);
 
-
-
 // reduce number of hearts when collision between player and enemy
 function reduceHearts() {
   const activeHeart = "rgb(232, 9, 9)";
@@ -237,7 +234,6 @@ function reduceHearts() {
     window.confirm("Game Over!");
   }
 }
-
 
 // rocks
 const rocks = {
