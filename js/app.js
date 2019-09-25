@@ -21,6 +21,7 @@ $("#characters").click(function(event) {
       player.sprite = 'images/char-horn-girl.png';
       break;  
   }
+  
 
   $("#myModal").modal("hide");
 
@@ -39,6 +40,12 @@ document.addEventListener('keyup', function(e) {
 });
 
 });
+
+// prevent modal from closing before character is chosen
+$('#myModal').modal({
+  backdrop: 'static',
+  keyboard: false
+})
 
 // to keep score of points
 let score = 0;
@@ -212,3 +219,18 @@ function reduceHearts() {
     window.confirm("Game Over!");
   }
 }
+
+// water traps
+// canvas = document.createElement('canvas');
+// ctx = canvas.getContext('2d');
+
+// const waterTraps = {
+//   sprite: "images/water-block.png",
+//   x: 101,
+//   y: 83,
+//   render: function() {
+//   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+//   }
+// }
+
+// waterTraps.render();

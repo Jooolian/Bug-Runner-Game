@@ -35,3 +35,7 @@ body {
 canvas {
     margin-top: -20px;
 }
+
+#myModal {
+    margin-top: 100px;
+}
