@@ -237,19 +237,42 @@ function reduceHearts() {
 
 // rocks
 const rocks = {
-  sprite: "images/Rock.png",
+  sprite: 'images/Rock.png',
   render: function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  },
+  moveRock: function() {
+    let coordinatesRocks = move();
+  
+    // create/ change coordinates properties in rocks object
+    rocks.x = coordinatesRocks[0];
+    rocks.y = coordinatesRocks[1];
+  
+    // repeatedly call function to move rock around
+    setTimeout(rocks.moveRock, 10000);
   }
 }
 
-// water
-const water = {
-  sprite: "images/water-block.png",
+// hearts
+const hearts = {
+  sprite: 'images/Heart.png',
   render: function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  },
+  moveHeart: function() {
+    let coordinatesRocks = move();
+  
+    // create/ change coordinates properties in rocks object
+    hearts.x = coordinatesRocks[0];
+    hearts.y = coordinatesRocks[1] + 25;
+  
+    // repeatedly call function to move rock around
+    setTimeout(hearts.moveHeart, 10000);
   }
 }
+
+rocks.moveRock();
+hearts.moveHeart();
 
 // function to move rocks around inside the playing field
 function move() {
@@ -265,28 +288,27 @@ let coordinates = [randomCoordinateX, randomCoordinateY];
 return coordinates; 
 }
 
-function moveRock() {
-  let coordinatesRocks = move();
+// // rocks with constructor
+// function Rocks(changeInterval) {
+//   this.sprite = "images/Rock.png",
+//   this.render = function() {
+//   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+//   },
+//   this.moveRock = function() {
+//     let coordinatesRocks = move();
+  
+//     // create/ change coordinates properties in rocks object
+//     this.x = coordinatesRocks[0];
+//     this.y = coordinatesRocks[1];
+  
+//     // repeatedly call function to move rock around
+//     setTimeout(moveRock, changeInterval);
+//   }
+// }
 
-  // create/ change coordinates properties in rocks object
-  rocks.x = coordinatesRocks[0];
-  rocks.y = coordinatesRocks[1];
+// let allRocks = [];
+// const firstRock = new Rocks(1000);
+// allRocks.push(firstRock);
+// allRocks[0].moveRock();
 
-  // repeatedly call function to move rock around
-  setInterval(moveRock, 10000);
-}
 
-moveRock();
-
-function moveWater() {
-  let coordinatesWater = move();
-
-  // create/ change coordinates properties in rocks object
-  water.x = coordinatesWater[0];
-  water.y = coordinatesWater[1];
-
-  // repeatedly call function to move rock around
-  setInterval(moveWater, 10000);
-}
-
-moveWater();
