@@ -263,13 +263,19 @@ const rocks = {
   },
   moveRock: function() {
     let coordinatesRocks = move();
-  
-    // create/ change coordinates properties in rocks object
-    rocks.x = coordinatesRocks[0];
-    rocks.y = coordinatesRocks[1];
-  
-    // repeatedly call function to move rock around
-    setTimeout(rocks.moveRock, 10000);
+
+    // is another item on coordinates?
+    if (hearts.x == coordinatesRocks[0] && hearts.y == coordinatesRocks[1] || player.x == coordinatesRocks[0] && player.y == coordinatesRocks[1]) {
+      rocks.moveRock();
+    }
+    else {
+      // create/ change coordinates properties in rocks object
+      rocks.x = coordinatesRocks[0];
+      rocks.y = coordinatesRocks[1] - 10;  // to position the rock properly 
+    
+      // repeatedly call method to move rock around
+      setTimeout(rocks.moveRock, 1000);
+    }
   }
 }
 
@@ -280,14 +286,20 @@ const hearts = {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
   },
   moveHeart: function() {
-    let coordinatesRocks = move();
-  
-    // create/ change coordinates properties in rocks object
-    hearts.x = coordinatesRocks[0];
-    hearts.y = coordinatesRocks[1] + 25; // to position the heart properly 
-  
-    // repeatedly call function to move rock around
-    setTimeout(hearts.moveHeart, 10000);
+    let coordinatesHearts = move();
+
+    // is another item on coordinates?
+    if (rocks.x == coordinatesHearts[0] && rocks.y == coordinatesHearts[1] || player.x == coordinatesHearts[0] && player.y == coordinatesHearts[1]) {
+     hearts.moveHeart();
+    }
+    else {
+      // create/ change coordinates properties in rocks object
+      hearts.x = coordinatesHearts[0];
+      hearts.y = coordinatesHearts[1] + 25; // to position the heart properly 
+    
+      // repeatedly call method to move rock around
+      setTimeout(hearts.moveHeart, 1000);
+    }
   },
   collisionWidth: 101/2,
   collisionHeight: 83/2,
@@ -298,13 +310,14 @@ const hearts = {
   }
 }
 
+// call methods
 rocks.moveRock();
 hearts.moveHeart();
 
 // function to move rocks around inside the playing field
 function move() {
 //array for locations on playing field x: 0-101-202-303-404-505-606 and y: 57-140-223-306
-const playingField = [[0, 101, 202, 303, 404, 505, 606], [50, 133, 216, 299]];
+const playingField = [[0, 101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
 
 // create random numbers in the range of the indexes of the two arrays within playingField
 let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
