@@ -146,9 +146,8 @@ var Engine = (function(global) {
      */
     function renderEntities() {
         // order of function calls dictates order of layers in canvas
-        
-        rocks.render();
         hearts.render();
+        rocks.render();
 
         // allRocks.forEach(function(rock) {
         //     rock.render();

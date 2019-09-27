@@ -114,7 +114,12 @@ class ThePlayer {
            this.restart();
            reduceHearts();
          }
-       };
+       }
+        // heart collected?
+        if (this.x < hearts.x + hearts.collisionWidth && this.x + this.collisionWidth > hearts.x && this.y < hearts.y + hearts.collisionHeight && this.y + this.collisionHeight > hearts.y) {     
+          addHearts();
+          hearts.disappear();
+        }
 
        // did player reach water and win? Again, 60 added to vertically align with enemies
       //  if (this.y < 60) {
@@ -219,19 +224,34 @@ allEnemies.push(enemyEight);
 function reduceHearts() {
   const activeHeart = "rgb(232, 9, 9)";
   const lostHeart = "#e8e8e8";
-  console.log("first");
-  console.log($("#heart1").css("color"))
 
   if ($("#heart1").css("color") == activeHeart) {
     $("#heart1").css("color", lostHeart);
-    console.log("first");
   }
   else if ( $("#heart2").css("color") == activeHeart) {
     $("#heart2").css("color", lostHeart);
   }
   else if ($("#heart3").css("color") == activeHeart) {
     $("#heart3").css("color", lostHeart);
+  }
+  else if ($("#heart3").css("color") == lostHeart) {
     window.confirm("Game Over!");
+  }
+}
+
+// increase number of hearts when collision between player and heart
+function addHearts() {
+  const activeHeart = "rgb(232, 9, 9)";
+  const lostHeart = "rgb(232, 232, 232)";
+
+  if ($("#heart3").css("color") == lostHeart) {
+    $("#heart3").css("color", activeHeart);
+  }
+  else if ( $("#heart2").css("color") == lostHeart) {
+    $("#heart2").css("color", activeHeart);
+  }
+  else if ($("#heart1").css("color") == lostHeart) {
+    $("#heart1").css("color", activeHeart);
   }
 }
 
@@ -264,10 +284,17 @@ const hearts = {
   
     // create/ change coordinates properties in rocks object
     hearts.x = coordinatesRocks[0];
-    hearts.y = coordinatesRocks[1] + 25;
+    hearts.y = coordinatesRocks[1] + 25; // to position the heart properly 
   
     // repeatedly call function to move rock around
     setTimeout(hearts.moveHeart, 10000);
+  },
+  collisionWidth: 101/2,
+  collisionHeight: 83/2,
+  // move heart off canvas until next call by setTimeout
+  disappear: function() {
+    hearts.x = -200;
+    hearts.y = 0;
   }
 }
 
