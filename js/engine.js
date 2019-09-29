@@ -155,6 +155,7 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
+
     }
 
     /* This function does nothing but it could have been a good place to

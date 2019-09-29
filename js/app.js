@@ -43,9 +43,6 @@ $('#myModal').modal({
   keyboard: false
 })
 
-// to keep score of points
-let score = 0;
-
 // Enemies our player must avoid
 // you enter the position of the enemy - either 0, 1, 2 - referencing the rows
 // of stone blocks and the speed the enemies are shall move at
@@ -116,23 +113,18 @@ class ThePlayer {
          }
        }
         // heart collected?
-        if (this.x < hearts.x + hearts.collisionWidth && this.x + this.collisionWidth > hearts.x && this.y < hearts.y + hearts.collisionHeight && this.y + this.collisionHeight > hearts.y) {     
-          addHearts();
-          hearts.disappear();
-        }
+        // if (this.x < hearts.x + hearts.collisionWidth && this.x + this.collisionWidth > hearts.x && this.y < hearts.y + hearts.collisionHeight && this.y + this.collisionHeight > hearts.y) {     
+        //   addHearts();
+        //   hearts.disappear();
 
-       // did player reach water and win? Again, 60 added to vertically align with enemies
-      //  if (this.y < 60) {
-         // if yes change score and reset player to start
-        //  score += 1;
-        //  this.restart();
-         // has the player won (scored 10 points)? Open modal (also stops game)
-    //      if (score > 0) {
-    //        if(window.confirm("You won! Do you want to play another round?")) {
-    //          this.newGame();
-    //      }
-    //    }
-    //  }
+        for (let item of allItems) {
+          if (item != player) {
+            if (this.x < item.x + item.collisionWidth && this.x + this.collisionWidth > item.x && this.y < item.y + item.collisionHeight && this.y + this.collisionHeight > item.y) {     
+              item.add();
+              item.disappear();
+          }
+        }
+        }
     };
 
   // resets coordinates to start coordinates
@@ -239,45 +231,22 @@ function reduceHearts() {
   }
 }
 
-// increase number of hearts when collision between player and heart
-function addHearts() {
-  const activeHeart = "rgb(232, 9, 9)";
-  const lostHeart = "rgb(232, 232, 232)";
+// function to move rocks around inside the playing field
+function move() {
+  //array for locations on playing field x: 0-101-202-303-404-505-606 and y: 57-140-223-306
+  const playingField = [[0, 101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
+  
+  // create random numbers in the range of the indexes of the two arrays within playingField
+  let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
+  let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
+  
+  let coordinates = [randomCoordinateX, randomCoordinateY];
+  
+  return coordinates; 
+  }  
 
-  if ($("#heart3").css("color") == lostHeart) {
-    $("#heart3").css("color", activeHeart);
-  }
-  else if ( $("#heart2").css("color") == lostHeart) {
-    $("#heart2").css("color", activeHeart);
-  }
-  else if ($("#heart1").css("color") == lostHeart) {
-    $("#heart1").css("color", activeHeart);
-  }
-}
-
-// rocks
-const rocks = {
-  sprite: 'images/Rock.png',
-  render: function() {
-  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-  },
-  moveRock: function() {
-    let coordinatesRocks = move();
-
-    // is another item on coordinates?
-    if (hearts.x == coordinatesRocks[0] && hearts.y == coordinatesRocks[1] || player.x == coordinatesRocks[0] && player.y == coordinatesRocks[1]) {
-      rocks.moveRock();
-    }
-    else {
-      // create/ change coordinates properties in rocks object
-      rocks.x = coordinatesRocks[0];
-      rocks.y = coordinatesRocks[1] - 10;  // to position the rock properly 
-    
-      // repeatedly call method to move rock around
-      setTimeout(rocks.moveRock, 1000);
-    }
-  }
-}
+let allItems = [];
+allItems.push(player);
 
 // hearts
 const hearts = {
@@ -287,18 +256,27 @@ const hearts = {
   },
   moveHeart: function() {
     let coordinatesHearts = move();
+    let coordinatesTaken = 0;
+    // // is another item on coordinates?
+    // if (rocks.x == coordinatesHearts[0] && rocks.y == coordinatesHearts[1] || player.x == coordinatesHearts[0] && player.y == coordinatesHearts[1]) {
+    //  hearts.moveHeart();
+    // }
+    allItems.forEach(function(item) {
+      if (item != this) {
+        if (item.x == coordinatesHearts[0] && item.y == coordinatesHearts[1]) {
+          coordinatesTaken++;
+        }
+      }
+    });
+    
+    if (coordinatesTaken > 0) {
+      rocks.moveRock();
+    } 
 
-    // is another item on coordinates?
-    if (rocks.x == coordinatesHearts[0] && rocks.y == coordinatesHearts[1] || player.x == coordinatesHearts[0] && player.y == coordinatesHearts[1]) {
-     hearts.moveHeart();
-    }
     else {
-      // create/ change coordinates properties in rocks object
+      // create/change coordinates properties in hearts object
       hearts.x = coordinatesHearts[0];
       hearts.y = coordinatesHearts[1] + 25; // to position the heart properly 
-    
-      // repeatedly call method to move rock around
-      setTimeout(hearts.moveHeart, 1000);
     }
   },
   collisionWidth: 101/2,
@@ -307,48 +285,66 @@ const hearts = {
   disappear: function() {
     hearts.x = -200;
     hearts.y = 0;
+    // call moveHeart for new heart after break with no heart on playing field
+    setTimeout(hearts.moveHeart, 10000);
+    },
+  
+  // increase number of hearts when collision between player and heart
+  add: function() {
+    const activeHeart = "rgb(232, 9, 9)";
+    const lostHeart = "rgb(232, 232, 232)";
+  
+    if ($("#heart3").css("color") == lostHeart) {
+      $("#heart3").css("color", activeHeart);
+    }
+    else if ( $("#heart2").css("color") == lostHeart) {
+      $("#heart2").css("color", activeHeart);
+    }
+    else if ($("#heart1").css("color") == lostHeart) {
+      $("#heart1").css("color", activeHeart);
+    }
+  }
+}
+
+allItems.push(hearts);
+
+// rocks
+const rocks = {
+  sprite: 'images/Rock.png',
+  render: function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  },
+  moveRock: function() {
+    let coordinatesRocks = move();
+    let coordinatesTaken = 0;
+    // is another item on coordinates?
+    // if (hearts.x == coordinatesRocks[0] && hearts.y == coordinatesRocks[1] || player.x == coordinatesRocks[0] && player.y == coordinatesRocks[1]) {
+    //   rocks.moveRock();
+    // }
+    allItems.forEach(function(item) {
+      if (item != this) {
+        if (item.x == coordinatesRocks[0] && item.y == coordinatesRocks[1]) {
+          coordinatesTaken++;
+        }
+      }
+    });
+    
+    if (coordinatesTaken > 0) {
+      rocks.moveRock();
+    } 
+    else {
+      // create/ change coordinates properties in rocks object
+      rocks.x = coordinatesRocks[0];
+      rocks.y = coordinatesRocks[1] - 10;  // to position the rock properly 
+    
+      // repeatedly call method to move rock around
+      // setTimeout(rocks.moveRock, 10000);
+    }
   }
 }
 
 // call methods
 rocks.moveRock();
 hearts.moveHeart();
-
-// function to move rocks around inside the playing field
-function move() {
-//array for locations on playing field x: 0-101-202-303-404-505-606 and y: 57-140-223-306
-const playingField = [[0, 101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
-
-// create random numbers in the range of the indexes of the two arrays within playingField
-let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
-let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
-
-let coordinates = [randomCoordinateX, randomCoordinateY];
-
-return coordinates; 
-}
-
-// // rocks with constructor
-// function Rocks(changeInterval) {
-//   this.sprite = "images/Rock.png",
-//   this.render = function() {
-//   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-//   },
-//   this.moveRock = function() {
-//     let coordinatesRocks = move();
-  
-//     // create/ change coordinates properties in rocks object
-//     this.x = coordinatesRocks[0];
-//     this.y = coordinatesRocks[1];
-  
-//     // repeatedly call function to move rock around
-//     setTimeout(moveRock, changeInterval);
-//   }
-// }
-
-// let allRocks = [];
-// const firstRock = new Rocks(1000);
-// allRocks.push(firstRock);
-// allRocks[0].moveRock();
 
 
