@@ -120,8 +120,14 @@ class ThePlayer {
         for (let item of allItems) {
           if (item != player) {
             if (this.x < item.x + item.collisionWidth && this.x + this.collisionWidth > item.x && this.y < item.y + item.collisionHeight && this.y + this.collisionHeight > item.y) {     
+              if (item == Items) {
+                item.name.add();
+                item.name.disappear();
+              }
+              else {
               item.add();
               item.disappear();
+              }
           }
         }
         }
@@ -245,9 +251,8 @@ function move() {
   return coordinates; 
   }  
 
-let allItems = [];
-allItems.push(player);
-
+  let allItems = [];
+  
 // hearts
 const hearts = {
   sprite: 'images/Heart.png',
@@ -263,7 +268,7 @@ const hearts = {
     // }
     allItems.forEach(function(item) {
       if (item != this) {
-        if (item.x == coordinatesHearts[0] && item.y == coordinatesHearts[1]) {
+        if (item.x == coordinatesHearts[0] && item.y == coordinatesHearts[1] || item.y == coordinatesHearts[1] - 10) {
           coordinatesTaken++;
         }
       }
@@ -276,7 +281,7 @@ const hearts = {
     else {
       // create/change coordinates properties in hearts object
       hearts.x = coordinatesHearts[0];
-      hearts.y = coordinatesHearts[1] + 25; // to position the heart properly 
+      hearts.y = coordinatesHearts[1]; // to position the heart properly 
     }
   },
   collisionWidth: 101/2,
@@ -306,7 +311,7 @@ const hearts = {
   }
 }
 
-allItems.push(hearts);
+
 
 // rocks
 const rocks = {
@@ -343,8 +348,79 @@ const rocks = {
   }
 }
 
+
+let points = 0;
+
+
+// Items
+let Items = function(itemType) {
+  this.name = itemType;
+  this.sprite = `images/${itemType}.png`;
+  this.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  };
+  this.moveItem = function() {
+    let coordinatesItem = move();
+    let coordinatesTaken = 0;
+    
+    allItems.forEach(function(item) {
+      if (item != this) {
+        if (item.x == coordinatesItem[0] && item.y == coordinatesItem[1] || item.y == coordinatesItem[1] - 10) {
+          coordinatesTaken++;
+        }
+      }
+    });
+    
+    if (coordinatesTaken > 0) {
+      this.moveItem();
+    } 
+
+    else {
+      // create/change coordinates properties in hearts object
+      this.x = coordinatesItem[0];
+      this.y = coordinatesItem[1]; // to position the heart properly 
+    }
+  };
+  this.collisionWidth = 101/2;
+  this.collisionHeight = 83/2;
+  // move heart off canvas until next call by setTimeout
+  this.disappear = function() {
+    this.y = 0;
+    this.x = -200;
+    // call moveHeart for new heart after break with no heart on playing field
+    setTimeout(this.moveItem.bind(this), 10000);
+    };
+  
+  // increase number of hearts when collision between player and heart
+  this.add = function() {
+    if (this.name == "GemGreen") {
+      points += 15;
+    }
+    else if (this.name == "GemOrange") {
+      points += 10;
+    }
+    else if (this.name == "GemBlue") {
+      points += 5;
+    }
+    $("#points").text(`Points: ${points}`);
+  }
+}
+
+let GemBlue = new Items("GemBlue");
+let GemGreen = new Items("GemGreen");
+let GemOrange = new Items("GemOrange");
+
 // call methods
 rocks.moveRock();
 hearts.moveHeart();
+GemBlue.moveItem();
+GemOrange.moveItem();
+GemGreen.moveItem();
 
 
+allItems.push(GemBlue);
+allItems.push(GemGreen);
+allItems.push(GemOrange);
+allItems.push(hearts);
+allItems.push(rocks);
+allItems.push(player);
