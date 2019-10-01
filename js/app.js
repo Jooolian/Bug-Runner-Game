@@ -159,7 +159,7 @@ class ThePlayer {
       this.y -= this.verticalStep;
     } 
     // block step up if rock is in the way 
-    else if(key == "up" && this.y >= 60 && this.x == rocks.x && (this.y >= rocks.y + (2 * this.verticalStep + 10) || this.y < rocks.y)) {
+    else if(key == "up" && this.y >= 60 && this.x == rocks.x && (this.y >= rocks.y + (2 * this.verticalStep) || this.y < rocks.y)) {
       this.y -= this.verticalStep;
     }
     // step down
@@ -167,23 +167,23 @@ class ThePlayer {
       this.y += this.verticalStep;
     } 
     // block step down if rock is in the way
-    else if(key == "down" && this.y < (4 * this.verticalStep) && this.x == rocks.x && (this.y <= rocks.y - this.verticalStep || this.y > rocks.y)) {
+    else if(key == "down" && this.y < (4 * this.verticalStep) && this.x == rocks.x && (this.y <= rocks.y - (2 * this.verticalStep) || this.y > rocks.y)) {
       this.y += this.verticalStep;
     } 
     // step to the left
-    else if(key == "left" && this.x >= this.horizontalStep && this.y != rocks.y + 10) {
+    else if(key == "left" && this.x >= this.horizontalStep && this.y != rocks.y) {
       this.x -= this.horizontalStep;
     } 
     // block step to the left if rock is in the way
-    else if(key == "left" && this.x >= this.horizontalStep && this.y == rocks.y + 10 && (this.x >= rocks.x + 2 * this.horizontalStep || this.x <= rocks.x - this.horizontalStep)) {
+    else if(key == "left" && this.x >= this.horizontalStep && this.y == rocks.y && (this.x >= rocks.x + 2 * this.horizontalStep || this.x <= rocks.x - this.horizontalStep)) {
       this.x -= this.horizontalStep;
     } 
     // step to the right
-    else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y != rocks.y + 10) {
+    else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y != rocks.y) {
       this.x += this.horizontalStep;
     } 
       // block step to the left if rock is in the way
-    else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y == rocks.y + 10 && (this.x <= rocks.x - 2 * this.horizontalStep || this.x >= rocks.x + this.horizontalStep)) {
+    else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y == rocks.y && (this.x <= rocks.x - 2 * this.horizontalStep || this.x >= rocks.x + this.horizontalStep)) {
       this.x += this.horizontalStep;
     } 
   }
@@ -256,39 +256,37 @@ function move() {
 // hearts
 const hearts = {
   sprite: 'images/Heart.png',
+  y: 0,
+  x: -200,
   render: function() {
-  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-  },
-  moveHeart: function() {
-    let coordinatesHearts = move();
     let coordinatesTaken = 0;
-    // // is another item on coordinates?
-    // if (rocks.x == coordinatesHearts[0] && rocks.y == coordinatesHearts[1] || player.x == coordinatesHearts[0] && player.y == coordinatesHearts[1]) {
-    //  hearts.moveHeart();
-    // }
     allItems.forEach(function(item) {
-      if (item != this) {
-        if (item.x == coordinatesHearts[0] && item.y == coordinatesHearts[1] || item.y == coordinatesHearts[1] - 10) {
+      if (item != hearts) {
+        if (item.x == hearts.x && (item.y == hearts.y || item.y == hearts.y)) {
           coordinatesTaken++;
         }
       }
     });
     
     if (coordinatesTaken > 0) {
-      rocks.moveRock();
+      hearts.moveHeart();
     } 
-
     else {
-      // create/change coordinates properties in hearts object
-      hearts.x = coordinatesHearts[0];
-      hearts.y = coordinatesHearts[1]; // to position the heart properly 
+      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
+  },
+  moveHeart: function() {
+    let coordinatesHearts = move();
+    
+    // create/change coordinates properties in hearts object
+    hearts.x = coordinatesHearts[0];
+    hearts.y = coordinatesHearts[1]; // to position the heart properly 
   },
   collisionWidth: 101/2,
   collisionHeight: 83/2,
   // move heart off canvas until next call by setTimeout
   disappear: function() {
-    hearts.x = -200;
+    hearts.x = -202;
     hearts.y = 0;
     // call moveHeart for new heart after break with no heart on playing field
     setTimeout(hearts.moveHeart, 10000);
@@ -309,26 +307,19 @@ const hearts = {
       $("#heart1").css("color", activeHeart);
     }
   }
-}
-
-
+};
 
 // rocks
 const rocks = {
   sprite: 'images/Rock.png',
+  y: 0,
+  x: -200,
   render: function() {
-  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-  },
-  moveRock: function() {
-    let coordinatesRocks = move();
     let coordinatesTaken = 0;
-    // is another item on coordinates?
-    // if (hearts.x == coordinatesRocks[0] && hearts.y == coordinatesRocks[1] || player.x == coordinatesRocks[0] && player.y == coordinatesRocks[1]) {
-    //   rocks.moveRock();
-    // }
     allItems.forEach(function(item) {
-      if (item != this) {
-        if (item.x == coordinatesRocks[0] && item.y == coordinatesRocks[1]) {
+      if (item != rocks) {
+        // console.log("item: " + item.x + ", " + item.y + " this: " + rocks.x + ", " + rocks.y);
+        if (item.x == rocks.x && item.y == rocks.y) {
           coordinatesTaken++;
         }
       }
@@ -338,34 +329,34 @@ const rocks = {
       rocks.moveRock();
     } 
     else {
-      // create/ change coordinates properties in rocks object
-      rocks.x = coordinatesRocks[0];
-      rocks.y = coordinatesRocks[1] - 10;  // to position the rock properly 
+      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    }
+  },
+  moveRock: function() {
+    let coordinatesRocks = move();
+  
+    // create/ change coordinates properties in rocks object
+    rocks.x = coordinatesRocks[0];
+    rocks.y = coordinatesRocks[1];  // to position the rock properly 
     
       // repeatedly call method to move rock around
       // setTimeout(rocks.moveRock, 10000);
     }
-  }
-}
-
+  };
 
 let points = 0;
-
 
 // Items
 let Items = function(itemType) {
   this.name = itemType;
   this.sprite = `images/${itemType}.png`;
+  this.y = 0;
+  this.x = -200;
   this.render = function() {
-  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-  };
-  this.moveItem = function() {
-    let coordinatesItem = move();
     let coordinatesTaken = 0;
-    
     allItems.forEach(function(item) {
-      if (item != this) {
-        if (item.x == coordinatesItem[0] && item.y == coordinatesItem[1] || item.y == coordinatesItem[1] - 10) {
+      if ((item.hasOwnProperty("name") && item.name != this.name) || (item.name == undefined)) {
+        if (item.x == this.x && (item.y == this.y || item.y == this.y)) {
           coordinatesTaken++;
         }
       }
@@ -374,12 +365,16 @@ let Items = function(itemType) {
     if (coordinatesTaken > 0) {
       this.moveItem();
     } 
-
     else {
-      // create/change coordinates properties in hearts object
-      this.x = coordinatesItem[0];
-      this.y = coordinatesItem[1]; // to position the heart properly 
+      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
+  };
+  this.moveItem = function() {
+    let coordinatesItem = move();
+   
+    // create/change coordinates properties in hearts object
+    this.x = coordinatesItem[0];
+    this.y = coordinatesItem[1]; // to position the heart properly 
   };
   this.collisionWidth = 101/2;
   this.collisionHeight = 83/2;
@@ -416,7 +411,6 @@ hearts.moveHeart();
 GemBlue.moveItem();
 GemOrange.moveItem();
 GemGreen.moveItem();
-
 
 allItems.push(GemBlue);
 allItems.push(GemGreen);
