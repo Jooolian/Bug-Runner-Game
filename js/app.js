@@ -34,7 +34,6 @@ document.addEventListener('keyup', function(e) {
 
   player.handleInput(allowedKeys[e.keyCode]);
 });
-
 });
 
 // prevent modal from closing before character is chosen
@@ -99,6 +98,7 @@ class ThePlayer {
     // size that reacts to collisions
     this.collisionWidth = 101/2;
     this.collisionHeight= 83/2;
+    this.movingAllowed = true;
   }
 
   // updates player position, checks for collisions
@@ -109,7 +109,8 @@ class ThePlayer {
          if (this.x < enemy.x + enemy.collisionWidth && this.x + this.collisionWidth > enemy.x && this.y < enemy.y + enemy.collisionHeight && this.y + this.collisionHeight > enemy.y) {
            // if yes change score and reset to start
            this.restart();
-           reduceHearts();
+           this.reduceHearts();
+           this.blink();
          }
        }
         // heart collected?
@@ -154,6 +155,7 @@ class ThePlayer {
   // and this.y accordingly so the player moves
   handleInput(key) {
     // to better understand the restrictions around the rocks: height of the pngs is 171, visible height only 83!
+    if (this.movingAllowed == true) {
     // step up
     if(key == "up" && this.y >= 60 && this.x != rocks.x) {
       this.y -= this.verticalStep;
@@ -186,7 +188,52 @@ class ThePlayer {
     else if(key == "right" && this.x <= (5 * this.horizontalStep) && this.y == rocks.y && (this.x <= rocks.x - 2 * this.horizontalStep || this.x >= rocks.x + this.horizontalStep)) {
       this.x += this.horizontalStep;
     } 
-  }
+    }
+  };
+  // reduce number of hearts (when called after collision between player and enemy)
+  reduceHearts() {
+    const activeHeart = "rgb(232, 9, 9)";
+    const lostHeart = "#e8e8e8";
+
+    if ($("#heart1").css("color") == activeHeart) {
+      $("#heart1").css("color", lostHeart);
+    }
+    else if ( $("#heart2").css("color") == activeHeart) {
+      $("#heart2").css("color", lostHeart);
+    }
+    else if ($("#heart3").css("color") == activeHeart) {
+      $("#heart3").css("color", lostHeart);
+    }
+    else if ($("#heart3").css("color") == lostHeart) {
+      window.confirm("Game Over!");
+    }
+};
+  // make player blink after losing a life 
+  blink() {
+    this.movingAllowed = false;
+    const xDisappear = -303;
+    const yDisappear = -303;
+    this.x = xDisappear;
+    this.y = yDisappear;
+    
+    // const interval = 
+    setTimeout(function() {
+        this.x = this.startX;
+        this.y = this.startY;
+        setTimeout(function() {
+          this.x = xDisappear;
+          this.y = yDisappear;
+        }.bind(this), 500)
+        setTimeout(function() {
+          setTimeout(function() {
+          this.x = this.startX;
+          this.y = this.startY;
+          this.movingAllowed = true;
+          }.bind(this), 500)
+        }.bind(this), 500)
+    }.bind(this), 1000);
+  };
+
 };
 
 // instantiate new thePlayer and place object in a variable called player
@@ -218,28 +265,10 @@ let enemySeven = new Enemy(3, 175);
 let enemyEight = new Enemy(3, 75);
 allEnemies.push(enemyEight);
 
-// reduce number of hearts when collision between player and enemy
-function reduceHearts() {
-  const activeHeart = "rgb(232, 9, 9)";
-  const lostHeart = "#e8e8e8";
-
-  if ($("#heart1").css("color") == activeHeart) {
-    $("#heart1").css("color", lostHeart);
-  }
-  else if ( $("#heart2").css("color") == activeHeart) {
-    $("#heart2").css("color", lostHeart);
-  }
-  else if ($("#heart3").css("color") == activeHeart) {
-    $("#heart3").css("color", lostHeart);
-  }
-  else if ($("#heart3").css("color") == lostHeart) {
-    window.confirm("Game Over!");
-  }
-}
 
 // function to move rocks around inside the playing field
 function move() {
-  //array for locations on playing field x: 0-101-202-303-404-505-606 and y: 57-140-223-306
+  //array for possible locations on playing field x, y
   const playingField = [[0, 101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
   
   // create random numbers in the range of the indexes of the two arrays within playingField
@@ -256,18 +285,15 @@ function move() {
 // hearts
 const hearts = {
   sprite: 'images/Heart.png',
-  y: 0,
-  x: -200,
   render: function() {
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if (item != hearts) {
-        if (item.x == hearts.x && (item.y == hearts.y || item.y == hearts.y)) {
+        if (item.x == hearts.x && item.y == hearts.y) {
           coordinatesTaken++;
         }
       }
     });
-    
     if (coordinatesTaken > 0) {
       hearts.moveHeart();
     } 
@@ -277,10 +303,9 @@ const hearts = {
   },
   moveHeart: function() {
     let coordinatesHearts = move();
-    
     // create/change coordinates properties in hearts object
     hearts.x = coordinatesHearts[0];
-    hearts.y = coordinatesHearts[1]; // to position the heart properly 
+    hearts.y = coordinatesHearts[1]; 
   },
   collisionWidth: 101/2,
   collisionHeight: 83/2,
@@ -291,12 +316,10 @@ const hearts = {
     // call moveHeart for new heart after break with no heart on playing field
     setTimeout(hearts.moveHeart, 10000);
     },
-  
   // increase number of hearts when collision between player and heart
   add: function() {
     const activeHeart = "rgb(232, 9, 9)";
     const lostHeart = "rgb(232, 232, 232)";
-  
     if ($("#heart3").css("color") == lostHeart) {
       $("#heart3").css("color", activeHeart);
     }
@@ -312,56 +335,33 @@ const hearts = {
 // rocks
 const rocks = {
   sprite: 'images/Rock.png',
-  y: 0,
-  x: -200,
   render: function() {
-    let coordinatesTaken = 0;
-    allItems.forEach(function(item) {
-      if (item != rocks) {
-        // console.log("item: " + item.x + ", " + item.y + " this: " + rocks.x + ", " + rocks.y);
-        if (item.x == rocks.x && item.y == rocks.y) {
-          coordinatesTaken++;
-        }
-      }
-    });
-    
-    if (coordinatesTaken > 0) {
-      rocks.moveRock();
-    } 
-    else {
-      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    }
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
   },
   moveRock: function() {
     let coordinatesRocks = move();
-  
     // create/ change coordinates properties in rocks object
     rocks.x = coordinatesRocks[0];
-    rocks.y = coordinatesRocks[1];  // to position the rock properly 
-    
-      // repeatedly call method to move rock around
-      // setTimeout(rocks.moveRock, 10000);
+    rocks.y = coordinatesRocks[1];  
     }
   };
 
+// keeps the score shown at the top of the game
 let points = 0;
 
 // Items
 let Items = function(itemType) {
   this.name = itemType;
   this.sprite = `images/${itemType}.png`;
-  this.y = 0;
-  this.x = -200;
   this.render = function() {
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
-      if ((item.hasOwnProperty("name") && item.name != this.name) || (item.name == undefined)) {
-        if (item.x == this.x && (item.y == this.y || item.y == this.y)) {
+      if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
+        if (item.x == this.x && item.y == this.y) {
           coordinatesTaken++;
         }
       }
-    });
-    
+    })
     if (coordinatesTaken > 0) {
       this.moveItem();
     } 
@@ -371,22 +371,20 @@ let Items = function(itemType) {
   };
   this.moveItem = function() {
     let coordinatesItem = move();
-   
-    // create/change coordinates properties in hearts object
+    // create/change coordinates properties 
     this.x = coordinatesItem[0];
-    this.y = coordinatesItem[1]; // to position the heart properly 
+    this.y = coordinatesItem[1]; 
   };
   this.collisionWidth = 101/2;
   this.collisionHeight = 83/2;
-  // move heart off canvas until next call by setTimeout
+  // move item off canvas until next call by setTimeout
   this.disappear = function() {
     this.y = 0;
     this.x = -200;
-    // call moveHeart for new heart after break with no heart on playing field
+    // call after a while without the item on the playingfield 
     setTimeout(this.moveItem.bind(this), 10000);
     };
-  
-  // increase number of hearts when collision between player and heart
+  // different numbers of points depending on collected item
   this.add = function() {
     if (this.name == "GemGreen") {
       points += 15;
@@ -399,8 +397,9 @@ let Items = function(itemType) {
     }
     $("#points").text(`Points: ${points}`);
   }
-}
+};
 
+// instantiate objects
 let GemBlue = new Items("GemBlue");
 let GemGreen = new Items("GemGreen");
 let GemOrange = new Items("GemOrange");
@@ -412,9 +411,10 @@ GemBlue.moveItem();
 GemOrange.moveItem();
 GemGreen.moveItem();
 
+// push objects into array
+allItems.push(rocks);
+allItems.push(hearts);
 allItems.push(GemBlue);
 allItems.push(GemGreen);
 allItems.push(GemOrange);
-allItems.push(hearts);
-allItems.push(rocks);
 allItems.push(player);
