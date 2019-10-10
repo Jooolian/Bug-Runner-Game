@@ -215,8 +215,6 @@ class ThePlayer {
     const yDisappear = -303;
     this.x = xDisappear;
     this.y = yDisappear;
-    
-    // const interval = 
     setTimeout(function() {
         this.x = this.startX;
         this.y = this.startY;
@@ -233,7 +231,6 @@ class ThePlayer {
         }.bind(this), 500)
     }.bind(this), 1000);
   };
-
 };
 
 // instantiate new thePlayer and place object in a variable called player
@@ -280,7 +277,8 @@ function move() {
   return coordinates; 
   }  
 
-  let allItems = [];
+// allItems array to store the following objects in
+let allItems = [];
   
 // hearts
 const hearts = {
@@ -289,11 +287,11 @@ const hearts = {
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if (item != hearts) {
-        if (item.x == hearts.x && item.y == hearts.y) {
+        if (hearts.x != -200 && hearts.y != 0 && item.x != -200 && item.y != 0 && item.x == hearts.x && item.y == hearts.y) {
           coordinatesTaken++;
         }
       }
-    });
+    }.bind(this));
     if (coordinatesTaken > 0) {
       hearts.moveHeart();
     } 
@@ -357,11 +355,14 @@ let Items = function(itemType) {
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
-        if (item.x == this.x && item.y == this.y) {
+        // console.log(this.name);
+        // console.log(this.x + " ?= " + item.x + ", " + this.y + " ?= " + item.y)
+        if (this.x != -200 && this.y != 0 && item.x != -200 && item.y != 0 && this.x == item.x && this.y == item.y) {
+          console.log("coordinates taken!");
           coordinatesTaken++;
         }
       }
-    })
+    }.bind(this));
     if (coordinatesTaken > 0) {
       this.moveItem();
     } 
@@ -381,9 +382,10 @@ let Items = function(itemType) {
   this.disappear = function() {
     this.y = 0;
     this.x = -200;
-    // call after a while without the item on the playingfield 
-    setTimeout(this.moveItem.bind(this), 10000);
-    };
+    // call after a while without the item on the playingfield
+    
+    // setTimeout(this.moveItem.bind(this), 10000);
+    // };
   // different numbers of points depending on collected item
   this.add = function() {
     if (this.name == "GemGreen") {
