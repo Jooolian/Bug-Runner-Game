@@ -383,7 +383,16 @@ let Items = function(itemType) {
     this.y = 0;
     this.x = -200;
     // call after a while without the item on the playingfield
-    
+    if (this.name == "GemGreen") {
+      setTimeout(this.moveItem.bind(this), 6000);
+    }
+    else if (this.name == "GemOrange") {
+      setTimeout(this.moveItem.bind(this), 3000);
+    }
+    else if (this.name == "GemBlue") {
+      setTimeout(this.moveItem.bind(this), 1500);
+    }
+  };
     // setTimeout(this.moveItem.bind(this), 10000);
     // };
   // different numbers of points depending on collected item
