@@ -113,11 +113,7 @@ class ThePlayer {
            this.blink();
          }
        }
-        // heart collected?
-        // if (this.x < hearts.x + hearts.collisionWidth && this.x + this.collisionWidth > hearts.x && this.y < hearts.y + hearts.collisionHeight && this.y + this.collisionHeight > hearts.y) {     
-        //   addHearts();
-        //   hearts.disappear();
-
+        // item collected?
         for (let item of allItems) {
           if (item != player) {
             if (this.x < item.x + item.collisionWidth && this.x + this.collisionWidth > item.x && this.y < item.y + item.collisionHeight && this.y + this.collisionHeight > item.y) {     
@@ -126,8 +122,12 @@ class ThePlayer {
                 item.name.disappear();
               }
               else {
+              item.xPointShow = item.x;
+              item.yPointShow = item.y;
+              item.collision = true;
               item.add();
               item.disappear();
+              
               }
           }
         }
@@ -351,14 +351,14 @@ let points = 0;
 let Items = function(itemType) {
   this.name = itemType;
   this.sprite = `images/${itemType}.png`;
+  this.collision = false;
+  this.xPointShow = 0;
+  this.yPointShow = 0;
   this.render = function() {
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
-        // console.log(this.name);
-        // console.log(this.x + " ?= " + item.x + ", " + this.y + " ?= " + item.y)
         if (this.x != -200 && this.y != 0 && item.x != -200 && item.y != 0 && this.x == item.x && this.y == item.y) {
-          console.log("coordinates taken!");
           coordinatesTaken++;
         }
       }
@@ -368,6 +368,9 @@ let Items = function(itemType) {
     } 
     else {
       ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+      if (this.collision) {
+        this.pointsAnimation();
+      }
     }
   };
   this.moveItem = function() {
@@ -393,8 +396,7 @@ let Items = function(itemType) {
       setTimeout(this.moveItem.bind(this), 1500);
     }
   };
-    // setTimeout(this.moveItem.bind(this), 10000);
-    // };
+  
   // different numbers of points depending on collected item
   this.add = function() {
     if (this.name == "GemGreen") {
@@ -408,6 +410,28 @@ let Items = function(itemType) {
     }
     $("#points").text(`Points: ${points}`);
   }
+
+  // show points on playing field when gem is collected
+  this.pointsAnimation = function() {
+    let pointsShown;
+    if (this.name == "GemGreen") {
+      pointsShown = 15;
+    }
+    else if (this.name == "GemOrange") {
+      pointsShown = 10;
+    }
+    else if (this.name == "GemBlue") {
+      pointsShown = 5;
+    }
+
+   const sprite = `images/${pointsShown}.png`;
+      ctx.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
+      this.xPointShow++;
+      this.yPointShow--;
+      setTimeout(function() {
+        this.collision = false;
+      }.bind(this), 1000);
+  };
 };
 
 // instantiate objects
