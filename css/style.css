@@ -39,3 +39,23 @@ canvas {
 #myModal {
     margin-top: 100px;
 }
+
+#canvas1 {
+    position: absolute; 
+    left: 0%; 
+    right: 0%;
+    top: 8%;
+    margin-left:auto;
+    margin-right:auto;
+    z-index: 0;
+}
+
+#canvas2 {
+    position: absolute; 
+    left: 0%; 
+    right: 0%;
+    top: 8%;
+    margin-left:auto;
+    margin-right:auto;
+    z-index: 1;
+}

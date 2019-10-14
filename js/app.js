@@ -361,12 +361,14 @@ let Items = function(itemType) {
     }
   };
   this.moveItem = function() {
+    // get new coordinates
     let coordinatesItem = move();
-    // create/change coordinates properties 
+     
     let tryX = coordinatesItem[0],
     tryY = coordinatesItem[1]; 
 
     let coordinatesTaken = 0;
+    // check if other item in allItems already has these coordinates
     allItems.forEach(function(item) {
       if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
         if (tryX != -200 && tryY != 0 && item.x != -200 && item.y != 0 && tryX == item.x && tryY == item.y) {
@@ -378,6 +380,7 @@ let Items = function(itemType) {
       this.moveItem();
     }
     else {
+      // create/change coordinates properties
       this.x = coordinatesItem[0];
       this.y = coordinatesItem[1]; 
     } 
@@ -428,7 +431,7 @@ let Items = function(itemType) {
     }
 
    const sprite = `images/${pointsShown}.png`;
-      ctx.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
+      ctx2.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
       this.xPointShow++;
       this.yPointShow--;
       setTimeout(function() {

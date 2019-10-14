@@ -22,11 +22,19 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
+        canvas2 = doc.createElement('canvas'),
+        ctx2 = canvas2.getContext('2d'),
         lastTime;
 
     canvas.width = 707;
     canvas.height = 606;
+    canvas.id = "canvas1";
     doc.body.appendChild(canvas);
+
+    canvas2.width = 707;
+    canvas2.height = 606;
+    canvas2.id = "canvas2";
+    doc.body.appendChild(canvas2);
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -119,6 +127,7 @@ var Engine = (function(global) {
 
         // Before drawing, clear existing canvas
         ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx2.clearRect(0,0,canvas.width,canvas.height);
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -145,14 +154,11 @@ var Engine = (function(global) {
      * on your enemy and player entities within app.js
      */
     function renderEntities() {
-        // order of function calls dictates order of layers in canvas
-
+        // order of item calls dictates order of visual layering in canvas
         allItems.forEach(function(item) {
             item.render();
         });
-        // hearts.render();
-        // rocks.render();
-        // player.render();
+        
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
@@ -202,4 +208,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.ctx2 = ctx2;
 })(this);
