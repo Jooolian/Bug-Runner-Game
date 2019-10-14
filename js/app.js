@@ -291,7 +291,7 @@ const hearts = {
           coordinatesTaken++;
         }
       }
-    }.bind(this));
+    });
     if (coordinatesTaken > 0) {
       hearts.moveHeart();
     } 
@@ -355,29 +355,32 @@ let Items = function(itemType) {
   this.xPointShow = 0;
   this.yPointShow = 0;
   this.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    if (this.collision) {
+      this.pointsAnimation();
+    }
+  };
+  this.moveItem = function() {
+    let coordinatesItem = move();
+    // create/change coordinates properties 
+    let tryX = coordinatesItem[0],
+    tryY = coordinatesItem[1]; 
+
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
-        if (this.x != -200 && this.y != 0 && item.x != -200 && item.y != 0 && this.x == item.x && this.y == item.y) {
+        if (tryX != -200 && tryY != 0 && item.x != -200 && item.y != 0 && tryX == item.x && tryY == item.y) {
           coordinatesTaken++;
         }
       }
     }.bind(this));
     if (coordinatesTaken > 0) {
       this.moveItem();
-    } 
-    else {
-      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-      if (this.collision) {
-        this.pointsAnimation();
-      }
     }
-  };
-  this.moveItem = function() {
-    let coordinatesItem = move();
-    // create/change coordinates properties 
-    this.x = coordinatesItem[0];
-    this.y = coordinatesItem[1]; 
+    else {
+      this.x = coordinatesItem[0];
+      this.y = coordinatesItem[1]; 
+    } 
   };
   this.collisionWidth = 101/2;
   this.collisionHeight = 83/2;
