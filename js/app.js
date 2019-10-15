@@ -361,91 +361,95 @@ let Items = function(itemType) {
   this.collision = false;
   this.xPointShow = 0;
   this.yPointShow = 0;
-  this.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    if (this.collision) {
-      this.pointsAnimation();
-    }
-  };
-  this.moveItem = function() {
-    // get new coordinates
-    let coordinatesItem = move();
-     
-    let tryX = coordinatesItem[0],
-    tryY = coordinatesItem[1]; 
-
-    let coordinatesTaken = 0;
-    // check if other item in allItems already has these coordinates
-    allItems.forEach(function(item) {
-      if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
-        if (tryX != -200 && tryY != 0 && item.x != -200 && item.y != 0 && tryX == item.x && tryY == item.y) {
-          coordinatesTaken++;
-        }
-      }
-    }.bind(this));
-    if (coordinatesTaken > 0) {
-      this.moveItem();
-    }
-    else {
-      // create/change coordinates properties
-      this.x = coordinatesItem[0];
-      this.y = coordinatesItem[1]; 
-    } 
-  };
   this.collisionWidth = 101/2;
   this.collisionHeight = 83/2;
-  // move item off canvas until next call by setTimeout
-  this.disappear = function() {
-    this.y = 0;
-    this.x = -200;
-    // call after a while without the item on the playingfield
-    if (this.name == "GemGreen") {
-      setTimeout(this.moveItem.bind(this), 6000);
+};
+
+Items.prototype.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  if (this.collision) {
+    this.pointsAnimation();
+  }
+};
+
+Items.prototype.moveItem = function() {
+  // get new coordinates
+  let coordinatesItem = move();
+    
+  let tryX = coordinatesItem[0],
+  tryY = coordinatesItem[1]; 
+
+  let coordinatesTaken = 0;
+  // check if other item in allItems already has these coordinates
+  allItems.forEach(function(item) {
+    if ((item.hasOwnProperty("name") && item.name != this.name) || item.name == undefined) {
+      if (tryX != -200 && tryY != 0 && item.x != -200 && item.y != 0 && tryX == item.x && tryY == item.y) {
+        coordinatesTaken++;
+      }
     }
-    else if (this.name == "GemOrange") {
-      setTimeout(this.moveItem.bind(this), 3000);
-    }
-    else if (this.name == "GemBlue") {
-      setTimeout(this.moveItem.bind(this), 1500);
-    }
-  };
-  
-  // different numbers of points depending on collected item
-  this.add = function() {
-    if (this.name == "GemGreen") {
-      points += 15;
-    }
-    else if (this.name == "GemOrange") {
-      points += 10;
-    }
-    else if (this.name == "GemBlue") {
-      points += 5;
-    }
-    $("#points").text(`Points: ${points}`);
+  }.bind(this));
+  if (coordinatesTaken > 0) {
+    this.moveItem();
+  }
+  else {
+    // create/change coordinates properties
+    this.x = coordinatesItem[0];
+    this.y = coordinatesItem[1]; 
+  } 
+};
+
+// move item off canvas until next call by setTimeout
+Items.prototype.disappear = function() {
+  this.y = 0;
+  this.x = -200;
+  // call after a while without the item on the playingfield
+  if (this.name == "GemGreen") {
+    setTimeout(this.moveItem.bind(this), 6000);
+  }
+  else if (this.name == "GemOrange") {
+    setTimeout(this.moveItem.bind(this), 3000);
+  }
+  else if (this.name == "GemBlue") {
+    setTimeout(this.moveItem.bind(this), 1500);
+  }
+};
+
+// different numbers of points depending on collected item
+Items.prototype.add = function() {
+  if (this.name == "GemGreen") {
+    points += 15;
+  }
+  else if (this.name == "GemOrange") {
+    points += 10;
+  }
+  else if (this.name == "GemBlue") {
+    points += 5;
+  }
+  $("#points").text(`Points: ${points}`);
+}
+
+// show points on playing field when gem is collected
+Items.prototype.pointsAnimation = function() {
+  let pointsShown;
+  if (this.name == "GemGreen") {
+    pointsShown = 15;
+  }
+  else if (this.name == "GemOrange") {
+    pointsShown = 10;
+  }
+  else if (this.name == "GemBlue") {
+    pointsShown = 5;
   }
 
-  // show points on playing field when gem is collected
-  this.pointsAnimation = function() {
-    let pointsShown;
-    if (this.name == "GemGreen") {
-      pointsShown = 15;
-    }
-    else if (this.name == "GemOrange") {
-      pointsShown = 10;
-    }
-    else if (this.name == "GemBlue") {
-      pointsShown = 5;
-    }
-
-    const sprite = `images/${pointsShown}.png`;
-    ctx2.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
-    this.xPointShow++;
-    this.yPointShow--;
-      setTimeout(function() {
-        this.collision = false;
-      }.bind(this), 1000);
-  };
+  const sprite = `images/${pointsShown}.png`;
+  ctx2.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
+  this.xPointShow++;
+  this.yPointShow--;
+    setTimeout(function() {
+      this.collision = false;
+    }.bind(this), 1000);
 };
+
 
 // instantiate objects
 let GemBlue = new Items("GemBlue");
