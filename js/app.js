@@ -117,20 +117,13 @@ class ThePlayer {
         for (let item of allItems) {
           if (item != player) {
             if (this.x < item.x + item.collisionWidth && this.x + this.collisionWidth > item.x && this.y < item.y + item.collisionHeight && this.y + this.collisionHeight > item.y) {     
-              if (item == Items) {
-                item.name.add();
-                item.name.disappear();
-              }
-              else {
               item.xPointShow = item.x;
               item.yPointShow = item.y;
               item.collision = true;
               item.add();
               item.disappear();
-              
-              }
+            } 
           }
-        }
         }
     };
 
@@ -283,7 +276,13 @@ let allItems = [];
 // hearts
 const hearts = {
   sprite: 'images/Heart.png',
+  xPointShow: 0,
+  yPointShow: 0,
+  collision: false,
   render: function() {
+    if (hearts.collision) {
+      hearts.heartsAnimation();
+    }
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if (item != hearts) {
@@ -327,6 +326,14 @@ const hearts = {
     else if ($("#heart1").css("color") == lostHeart) {
       $("#heart1").css("color", activeHeart);
     }
+  },
+  heartsAnimation: function() {
+    ctx2.drawImage(Resources.get("images/Heart-small.png"), hearts.xPointShow + 50, hearts.yPointShow);
+    hearts.xPointShow++;
+    hearts.yPointShow--;
+      setTimeout(function() {
+        hearts.collision = false;
+      }, 1000);
   }
 };
 
@@ -430,10 +437,10 @@ let Items = function(itemType) {
       pointsShown = 5;
     }
 
-   const sprite = `images/${pointsShown}.png`;
-      ctx2.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
-      this.xPointShow++;
-      this.yPointShow--;
+    const sprite = `images/${pointsShown}.png`;
+    ctx2.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
+    this.xPointShow++;
+    this.yPointShow--;
       setTimeout(function() {
         this.collision = false;
       }.bind(this), 1000);
