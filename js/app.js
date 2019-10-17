@@ -109,7 +109,7 @@ class ThePlayer {
          if (this.x < enemy.x + enemy.collisionWidth && this.x + this.collisionWidth > enemy.x && this.y < enemy.y + enemy.collisionHeight && this.y + this.collisionHeight > enemy.y) {
            // if yes change score and reset to start
            this.restart();
-           this.reduceHearts();
+           hearts.reduceHearts();
            this.blink();
          }
        }
@@ -183,24 +183,6 @@ class ThePlayer {
     } 
     }
   };
-  // reduce number of hearts (when called after collision between player and enemy)
-  reduceHearts() {
-    const activeHeart = "rgb(232, 9, 9)";
-    const lostHeart = "#e8e8e8";
-
-    if ($("#heart1").css("color") == activeHeart) {
-      $("#heart1").css("color", lostHeart);
-    }
-    else if ( $("#heart2").css("color") == activeHeart) {
-      $("#heart2").css("color", lostHeart);
-    }
-    else if ($("#heart3").css("color") == activeHeart) {
-      $("#heart3").css("color", lostHeart);
-    }
-    else if ($("#heart3").css("color") == lostHeart) {
-      window.confirm("Game Over!");
-    }
-};
   // make player blink after losing a life 
   blink() {
     this.movingAllowed = false;
@@ -272,47 +254,82 @@ function move() {
 
 // allItems array to store the following objects in
 let allItems = [];
-  
+
+
+// rocks
+const rocks = {
+  sprite: 'images/Rock.png',
+  render: function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  },
+  moveIt: function() {
+    let coordinatesRocks = move();
+    // create/ change coordinates properties in rocks object
+    rocks.x = coordinatesRocks[0];
+    rocks.y = coordinatesRocks[1];  
+    }
+  };
+
 // hearts
 const hearts = {
   sprite: 'images/Heart.png',
   xPointShow: 0,
   yPointShow: 0,
   collision: false,
+  collisionWidth: 101/2,
+  collisionHeight: 83/2,
   render: function() {
     if (hearts.collision) {
       hearts.heartsAnimation();
     }
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+  },
+  moveIt: function() {
+    let coordinatesHearts = move();
+    let xMove = coordinatesHearts[0];
+    let yMove = coordinatesHearts[1];
     let coordinatesTaken = 0;
     allItems.forEach(function(item) {
       if (item != hearts) {
-        if (hearts.x != -200 && hearts.y != 0 && item.x != -200 && item.y != 0 && item.x == hearts.x && item.y == hearts.y) {
+        if (hearts.x != -200 && hearts.y != 0 && item.x != -200 && item.y != 0 && item.x == xMove && item.y == yMove) {
           coordinatesTaken++;
         }
       }
-    });
+    })
     if (coordinatesTaken > 0) {
-      hearts.moveHeart();
+      hearts.moveIt();
     } 
-    else {
-      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    }
-  },
-  moveHeart: function() {
-    let coordinatesHearts = move();
     // create/change coordinates properties in hearts object
+    else {
     hearts.x = coordinatesHearts[0];
     hearts.y = coordinatesHearts[1]; 
+    }
   },
-  collisionWidth: 101/2,
-  collisionHeight: 83/2,
   // move heart off canvas until next call by setTimeout
   disappear: function() {
     hearts.x = -202;
     hearts.y = 0;
     // call moveHeart for new heart after break with no heart on playing field
-    setTimeout(hearts.moveHeart, 10000);
+    setTimeout(hearts.moveIt, 10000);
     },
+    // reduce number of hearts (when called after collision between player and enemy)
+  reduceHearts() {
+    const activeHeart = "rgb(232, 9, 9)";
+    const lostHeart = "#e8e8e8";
+
+    if ($("#heart1").css("color") == activeHeart) {
+      $("#heart1").css("color", lostHeart);
+    }
+    else if ( $("#heart2").css("color") == activeHeart) {
+      $("#heart2").css("color", lostHeart);
+    }
+    else if ($("#heart3").css("color") == activeHeart) {
+      $("#heart3").css("color", lostHeart);
+    }
+    else if ($("#heart3").css("color") == lostHeart) {
+      window.confirm("Game Over!");
+    }
+  },
   // increase number of hearts when collision between player and heart
   add: function() {
     const activeHeart = "rgb(232, 9, 9)";
@@ -337,20 +354,6 @@ const hearts = {
   }
 };
 
-// rocks
-const rocks = {
-  sprite: 'images/Rock.png',
-  render: function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-  },
-  moveRock: function() {
-    let coordinatesRocks = move();
-    // create/ change coordinates properties in rocks object
-    rocks.x = coordinatesRocks[0];
-    rocks.y = coordinatesRocks[1];  
-    }
-  };
-
 // keeps the score shown at the top of the game
 let points = 0;
 
@@ -372,7 +375,7 @@ Items.prototype.render = function() {
   }
 };
 
-Items.prototype.moveItem = function() {
+Items.prototype.moveIt = function() {
   // get new coordinates
   let coordinatesItem = move();
     
@@ -389,7 +392,7 @@ Items.prototype.moveItem = function() {
     }
   }.bind(this));
   if (coordinatesTaken > 0) {
-    this.moveItem();
+    this.moveIt();
   }
   else {
     // create/change coordinates properties
@@ -404,13 +407,13 @@ Items.prototype.disappear = function() {
   this.x = -200;
   // call after a while without the item on the playingfield
   if (this.name == "GemGreen") {
-    setTimeout(this.moveItem.bind(this), 6000);
+    setTimeout(this.moveIt.bind(this), 6000);
   }
   else if (this.name == "GemOrange") {
-    setTimeout(this.moveItem.bind(this), 3000);
+    setTimeout(this.moveIt.bind(this), 3000);
   }
   else if (this.name == "GemBlue") {
-    setTimeout(this.moveItem.bind(this), 1500);
+    setTimeout(this.moveIt.bind(this), 1500);
   }
 };
 
@@ -450,18 +453,17 @@ Items.prototype.pointsAnimation = function() {
     }.bind(this), 1000);
 };
 
-
 // instantiate objects
 let GemBlue = new Items("GemBlue");
 let GemGreen = new Items("GemGreen");
 let GemOrange = new Items("GemOrange");
 
 // call methods
-rocks.moveRock();
-hearts.moveHeart();
-GemBlue.moveItem();
-GemOrange.moveItem();
-GemGreen.moveItem();
+rocks.moveIt();
+hearts.moveIt();
+GemBlue.moveIt();
+GemOrange.moveIt();
+GemGreen.moveIt();
 
 // push objects into array
 allItems.push(rocks);
@@ -470,3 +472,10 @@ allItems.push(GemBlue);
 allItems.push(GemGreen);
 allItems.push(GemOrange);
 allItems.push(player);
+
+// initial call of all moveIt methods
+// allItems.forEach(function(item) {
+//   if (item != "thePlayer") {
+//     item.moveIt();
+//   }
+// })
