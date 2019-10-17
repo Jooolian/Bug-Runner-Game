@@ -458,13 +458,6 @@ let GemBlue = new Items("GemBlue");
 let GemGreen = new Items("GemGreen");
 let GemOrange = new Items("GemOrange");
 
-// call methods
-rocks.moveIt();
-hearts.moveIt();
-GemBlue.moveIt();
-GemOrange.moveIt();
-GemGreen.moveIt();
-
 // push objects into array
 allItems.push(rocks);
 allItems.push(hearts);
@@ -474,8 +467,8 @@ allItems.push(GemOrange);
 allItems.push(player);
 
 // initial call of all moveIt methods
-// allItems.forEach(function(item) {
-//   if (item != "thePlayer") {
-//     item.moveIt();
-//   }
-// })
+allItems.forEach(function(item) {
+  if (item != "thePlayer") {
+    item.moveIt();
+  }
+})
