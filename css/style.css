@@ -36,7 +36,7 @@ canvas {
     margin-top: -20px;
 }
 
-#myModal {
+#modalStart, #modalEnd {
     margin-top: 100px;
 }
 
@@ -58,4 +58,44 @@ canvas {
     margin-left:auto;
     margin-right:auto;
     z-index: 1;
+}
+
+#playerNameButton {
+    color: white; 
+    background-color: #d9534f;
+    border-color: #d9534f;
+    margin-top: 10px;
+    width: 80px;
+    margin: auto;
+}
+
+#playerNameText {
+    margin-top: 1em;
+    font-size: 16px;;
+}
+
+#playerName {
+    width: 150px;
+    margin: auto;
+    margin-bottom: 10px;
+    display: block;
+}
+
+table {
+    text-align: center;
+    margin: auto;
+}
+
+td, th { 
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+#newGame {
+    width: 100px;
+} 
+
+#playerNameText, #gameOverText {
+    font-weight: 700 !important;
+    font-size: 16px;
 }

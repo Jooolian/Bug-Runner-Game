@@ -1,7 +1,9 @@
 $(document).ready(function() {
   // Show the Modal on load
-  $("#myModal").modal("show");
+  $("#modalStart").modal("show");
 });
+
+$(".modal-title").text("Hi, choose a player!");
 
 $("#characters").click(function(event) {
   switch (event.target.id) {
@@ -19,7 +21,7 @@ $("#characters").click(function(event) {
       break;  
   }
   
-  $("#myModal").modal("hide");
+  $("#modalStart").modal("hide");
 
   // This listens for key presses and sends the keys to
   // Player.handleInput() method. This should only be enabled
@@ -35,12 +37,6 @@ document.addEventListener('keyup', function(e) {
   player.handleInput(allowedKeys[e.keyCode]);
 });
 });
-
-// prevent modal from closing before character is chosen
-$('#myModal').modal({
-  backdrop: 'static',
-  keyboard: false
-})
 
 // Enemies our player must avoid
 // you enter the position of the enemy - either 0, 1, 2 - referencing the rows
@@ -135,8 +131,7 @@ class ThePlayer {
 
   // starts a new game
   newGame() {
-    this.restart();
-    score = 0;
+    location.reload();
   };
 
   // render player at x,y coordinates
@@ -147,7 +142,7 @@ class ThePlayer {
   // handle the input from the eventlistener and change this.x
   // and this.y accordingly so the player moves
   handleInput(key) {
-    // to better understand the restrictions around the rocks: height of the pngs is 171, visible height only 83!
+    // moving is not allowed while modals are open
     if (this.movingAllowed == true) {
     // step up
     if(key == "up" && this.y >= 60 && this.x != rocks.x) {
@@ -214,47 +209,39 @@ const player = new ThePlayer();
 // create array allEnemies, instantiate enemies and push into allEnemies
 let allEnemies = [];
 
-let enemyOne = new Enemy(0, 100);
-allEnemies.push(enemyOne);
+// make enemies using randoms for speed and track and add them to allEnemies
+function createEnemies() {
+  let numberEnemies = 8;
 
-let enemyTwo = new Enemy(1, 200);
-allEnemies.push(enemyTwo);
+  for (let i = 0; i < numberEnemies; i++) {
+    let randomTrack = Math.floor(Math.random() * 4);
+    // from https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
+    function getRandomSpeed(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }  
+    let randomSpeed = getRandomSpeed(75, 275);
+    // from https://stackoverflow.com/questions/6645067/javascript-dynamically-creating-variables-for-loops
+    window["enemy" + i] = new Enemy(randomTrack, randomSpeed);
+    allEnemies.push(window["enemy" + i]);
+  }
+}
+createEnemies();
 
-let enemyThree = new Enemy(2, 150);
-allEnemies.push(enemyThree);
-
-let enemyFour = new Enemy(2, 200);
-allEnemies.push(enemyFour);
-
-let enemyFive = new Enemy(1, 225);
-allEnemies.push(enemyFive);
-
-let enemySix = new Enemy(0, 250);
-allEnemies.push(enemySix);
-
-let enemySeven = new Enemy(3, 175);
-
-let enemyEight = new Enemy(3, 75);
-allEnemies.push(enemyEight);
-
-
-// function to move rocks around inside the playing field
+// creates coordinates for the items
 function move() {
   //array for possible locations on playing field x, y
   const playingField = [[0, 101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
-  
   // create random numbers in the range of the indexes of the two arrays within playingField
   let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
   let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
-  
   let coordinates = [randomCoordinateX, randomCoordinateY];
-  
   return coordinates; 
-  }  
+}; 
 
 // allItems array to store the following objects in
 let allItems = [];
-
 
 // rocks
 const rocks = {
@@ -264,7 +251,6 @@ const rocks = {
   },
   moveIt: function() {
     let coordinatesRocks = move();
-    // create/ change coordinates properties in rocks object
     rocks.x = coordinatesRocks[0];
     rocks.y = coordinatesRocks[1];  
     }
@@ -278,12 +264,14 @@ const hearts = {
   collision: false,
   collisionWidth: 101/2,
   collisionHeight: 83/2,
+  // render animation during collision and render heart in general
   render: function() {
     if (hearts.collision) {
       hearts.heartsAnimation();
     }
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
   },
+  // create coordinates and check whether they are already taken 
   moveIt: function() {
     let coordinatesHearts = move();
     let xMove = coordinatesHearts[0];
@@ -299,7 +287,6 @@ const hearts = {
     if (coordinatesTaken > 0) {
       hearts.moveIt();
     } 
-    // create/change coordinates properties in hearts object
     else {
     hearts.x = coordinatesHearts[0];
     hearts.y = coordinatesHearts[1]; 
@@ -309,14 +296,12 @@ const hearts = {
   disappear: function() {
     hearts.x = -202;
     hearts.y = 0;
-    // call moveHeart for new heart after break with no heart on playing field
     setTimeout(hearts.moveIt, 10000);
     },
-    // reduce number of hearts (when called after collision between player and enemy)
+    // reduce number of hearts at the top (when called after collision between player and enemy)
   reduceHearts() {
     const activeHeart = "rgb(232, 9, 9)";
-    const lostHeart = "#e8e8e8";
-
+    const lostHeart = "rgb(232, 232, 232)";
     if ($("#heart1").css("color") == activeHeart) {
       $("#heart1").css("color", lostHeart);
     }
@@ -325,11 +310,9 @@ const hearts = {
     }
     else if ($("#heart3").css("color") == activeHeart) {
       $("#heart3").css("color", lostHeart);
-    }
-    else if ($("#heart3").css("color") == lostHeart) {
-      window.confirm("Game Over!");
-    }
-  },
+      gameOver();
+      }
+    },
   // increase number of hearts when collision between player and heart
   add: function() {
     const activeHeart = "rgb(232, 9, 9)";
@@ -344,6 +327,7 @@ const hearts = {
       $("#heart1").css("color", activeHeart);
     }
   },
+  // show animated heart flying away when heart is collected
   heartsAnimation: function() {
     ctx2.drawImage(Resources.get("images/Heart-small.png"), hearts.xPointShow + 50, hearts.yPointShow);
     hearts.xPointShow++;
@@ -353,6 +337,105 @@ const hearts = {
       }, 1000);
   }
 };
+
+// open game over modal, show message, give opportunity to input player name for leaderboard
+function gameOver() {
+      $("#modalEnd").modal("show");
+      
+      // end rendering ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ find better solution
+      delete player.sprite
+ 
+      $(".modal-title").text("Game Over");
+
+      let gameOverText = document.createElement("div");
+      gameOverText.setAttribute("id", "gameOverText");
+      gameOverText.textContent = `Congratulations! You scored ${points} points!`;
+      $("#endMessage").append(gameOverText);
+
+      let playerNameText = document.createElement("label");
+      playerNameText.setAttribute("id", "playerNameText");
+      playerNameText.textContent = "To see whether you made the top 5, enter your name here: ";
+      $("#endMessage").append(playerNameText);
+
+      let playerName = document.createElement("input");
+      playerName.setAttribute("type", "text");
+      playerName.setAttribute("placeholder", " Your player name");
+      playerName.setAttribute("id", "playerName");
+      playerName.setAttribute("maxlength", "12");
+      $("#endMessage").append(playerName);
+
+      let playerNameButton = document.createElement("button");
+      playerNameButton.setAttribute("id", "playerNameButton");
+      playerNameButton.setAttribute("type", "submit");
+      playerNameButton.setAttribute("class", "btn btn-secondary");
+      playerNameButton.textContent = "OK";
+      $("#endMessage").append(playerNameButton);
+
+      let newGameButton = document.createElement("button");
+      newGameButton.setAttribute("id", "newGameButton");
+      newGameButton.setAttribute("type", "button");
+      newGameButton.setAttribute("class", "btn btn-danger");
+      newGameButton.textContent = "New Game";
+      $("#modalEnd .modal-footer").append(newGameButton);
+
+      $("#newGameButton").one("click", function() {
+        console.log("persil");
+        player.newGame();
+      });
+
+      // when clicked, save modal input and player data in local storage 
+      $("#playerNameButton").one("click", function() {    
+        const newEntry = {
+          name: playerName.value,
+          score: points
+        }
+
+        //get leaderboard from local storage
+        leaderboard = JSON.parse(localStorage.getItem("leaderboard"));
+        // add result to leaderboard
+          if (leaderboard === null) {
+            leaderboard = [];
+            leaderboard.push(newEntry);
+          }       
+          else {
+            leaderboard.push(newEntry)
+          }
+        // sort leaderboard entries
+          leaderboard.sort(function (a, b) {
+            if (a.score < b.score) {
+              return 1;
+            }
+            else {
+              return -1
+            }
+          });
+          // cut off excess leaderboard entries 
+          if (leaderboard.length > 5) {
+            leaderboard.pop();
+          }
+        
+          // save updated top 5 to localstorage 
+          localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+          
+          // build leaderboard structure
+          $("#playerName").val("");
+          $(".modal-title").text("Leaderboard");
+          $("#endMessage").html("<table><tr><td><b>Name</b></td><td><b>Score</b></td></tr></table>");
+
+          // fill leaderboard with entries
+          for (i = 0; i < leaderboard.length; i++) {
+            if (leaderboard[i].name == "") {
+              const newRow = $("<tr><td>-</td><td>" + leaderboard[i].score + "</td></tr>");
+              $("#endMessage table").append(newRow);
+            }
+            else {
+            const newRow = $("<tr><td>" + leaderboard[i].name + "</td><td>" + leaderboard[i].score + "</td></tr>");
+            $("#endMessage table").append(newRow);
+            }
+          }
+  })
+};
+
 
 // keeps the score shown at the top of the game
 let points = 0;
@@ -378,10 +461,8 @@ Items.prototype.render = function() {
 Items.prototype.moveIt = function() {
   // get new coordinates
   let coordinatesItem = move();
-    
   let tryX = coordinatesItem[0],
   tryY = coordinatesItem[1]; 
-
   let coordinatesTaken = 0;
   // check if other item in allItems already has these coordinates
   allItems.forEach(function(item) {
@@ -443,7 +524,6 @@ Items.prototype.pointsAnimation = function() {
   else if (this.name == "GemBlue") {
     pointsShown = 5;
   }
-
   const sprite = `images/${pointsShown}.png`;
   ctx2.drawImage(Resources.get(sprite), this.xPointShow + 50, this.yPointShow);
   this.xPointShow++;
