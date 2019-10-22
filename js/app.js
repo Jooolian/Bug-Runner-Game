@@ -233,7 +233,7 @@ function createEnemies() {
       max = Math.floor(max);
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }  
-    let randomSpeed = getRandomSpeed(75, 275);
+    let randomSpeed = getRandomSpeed(75, 175);
     // from https://stackoverflow.com/questions/6645067/javascript-dynamically-creating-variables-for-loops
     window["enemy" + i] = new Enemy(randomTrack, randomSpeed);
     allEnemies.push(window["enemy" + i]);
@@ -245,24 +245,21 @@ createEnemies();
 let time = 0;
 function accelerateEnemies() {
   setInterval(function() {
-    console.log(enemy1.speed);
     time++;
-    console.log(time);
     // accelerate enemies after 30 seconds
-    if (time % 30 == 0) {
+    if (time % 15 == 0) {
       allEnemies.forEach(function(enemy) {
-        enemy.speed += 50;
+        enemy.speed += 15;
       });
-      console.log(enemy1.speed);
   }}, 1000)
   };
 
 // creates coordinates for the items
 function move() {
   //array for possible locations on playing field x, y
-  const playingField = [[0, 101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
+  const playingField = [[101, 202, 303, 404, 505, 606], [60, 143, 226, 309]];
   // create random numbers in the range of the indexes of the two arrays within playingField
-  let randomCoordinateX = playingField[0][Math.floor(Math.random() * 6)];  
+  let randomCoordinateX = playingField[0][Math.floor(Math.random() * 5)];  
   let randomCoordinateY = playingField[1][Math.floor(Math.random() * 4)];
   let coordinates = [randomCoordinateX, randomCoordinateY];
   return coordinates; 
@@ -562,16 +559,27 @@ Items.prototype.pointsAnimation = function() {
 };
 
 // instantiate objects
-let GemBlue = new Items("GemBlue");
-let GemGreen = new Items("GemGreen");
-let GemOrange = new Items("GemOrange");
-
+let GemBlue1 = new Items("GemBlue");
+let GemGreen1 = new Items("GemGreen");
+let GemOrange1 = new Items("GemOrange");
+let GemBlue2 = new Items("GemBlue");
+let GemGreen2 = new Items("GemGreen");
+let GemOrange2 = new Items("GemOrange");
+let GemBlue3 = new Items("GemBlue");
+let GemGreen3 = new Items("GemGreen");
+let GemOrange3 = new Items("GemOrange");
 // push objects into array
 allItems.push(rocks);
 allItems.push(hearts);
-allItems.push(GemBlue);
-allItems.push(GemGreen);
-allItems.push(GemOrange);
+allItems.push(GemBlue1);
+allItems.push(GemGreen1);
+allItems.push(GemOrange1);
+allItems.push(GemBlue2);
+allItems.push(GemGreen2);
+allItems.push(GemOrange2);
+allItems.push(GemBlue3);
+allItems.push(GemGreen3);
+allItems.push(GemOrange3);
 allItems.push(player);
 
 // initial call of all moveIt methods
