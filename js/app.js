@@ -5,6 +5,7 @@ $(document).ready(function() {
 
 $(".modal-title").text("Hi, choose a player!");
 
+// choose character to start game
 $("#characters").click(function(event) {
   switch (event.target.id) {
     case "boy":
@@ -20,9 +21,10 @@ $("#characters").click(function(event) {
       player.sprite = 'images/char-horn-girl.png';
       break;  
   }
-  
+  // close modal
   $("#modalStart").modal("hide");
-
+  // start timer to accelerate enemies
+  accelerateEnemies()
   // This listens for key presses and sends the keys to
   // Player.handleInput() method. This should only be enabled
   // after player has chosen a character
@@ -33,7 +35,6 @@ document.addEventListener('keyup', function(e) {
       39: 'right',
       40: 'down'
   };
-
   player.handleInput(allowedKeys[e.keyCode]);
 });
 });
@@ -212,9 +213,20 @@ let allEnemies = [];
 // make enemies using randoms for speed and track and add them to allEnemies
 function createEnemies() {
   let numberEnemies = 8;
-
   for (let i = 0; i < numberEnemies; i++) {
-    let randomTrack = Math.floor(Math.random() * 4);
+    let randomTrack;
+    if (i == 0 || i == 1) {
+      randomTrack = 0;
+    }
+    if (i == 2 || i == 3) {
+      randomTrack = 1;
+    }
+    if (i == 4 || i == 5) {
+      randomTrack = 2;
+    }
+    if (i == 6 || i == 7) {
+      randomTrack = 3;
+    }
     // from https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
     function getRandomSpeed(min, max) {
       min = Math.ceil(min);
@@ -228,6 +240,22 @@ function createEnemies() {
   }
 }
 createEnemies();
+
+// accelerate enemies
+let time = 0;
+function accelerateEnemies() {
+  setInterval(function() {
+    console.log(enemy1.speed);
+    time++;
+    console.log(time);
+    // accelerate enemies after 30 seconds
+    if (time % 30 == 0) {
+      allEnemies.forEach(function(enemy) {
+        enemy.speed += 50;
+      });
+      console.log(enemy1.speed);
+  }}, 1000)
+  };
 
 // creates coordinates for the items
 function move() {
